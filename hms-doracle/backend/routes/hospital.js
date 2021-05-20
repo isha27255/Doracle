@@ -17,20 +17,22 @@ router.post("/add", (req, res) => {
   
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
-  const patientID = req.body.patientID;
+  // const patientID = req.body.patientID;
   const password= req.body.password;
-  
+
+  let healthid="IND";
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for ( let i = 0; i < 6; i++ ) {
+    healthid+=characters.charAt(Math.floor(Math.random() * charactersLength));
+ }
+  const patientID = healthid;
+  // console.log(healthid);
   const new_patient = new Patient({firstname, lastname, patientID, password});
-  console.log(new_patient);
+  // console.log(new_patient);
   new_patient.save()
       .then(() => res.json("Patient Added Successfully"))
       .catch(err => res.status(400).json("Error is " + err));       
-});
-
-router.get("/:id", (req, res) => {
-  Patient.findById(req.params.id)
-    .then(patient => res.json(patient))
-    .catch(err => res.status(400).json("Error is " + err));       
 });
 
 router.delete("/delete/:id", (req, res) => {
