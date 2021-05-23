@@ -13,6 +13,16 @@ const PatientSchema = new Schema({
     trim: true,
     required: true
   }, 
+  email : {
+      type: String,
+      trim: true,
+      required: true
+  },
+  contact: {
+      type: Number,
+      trim: true,
+      required: true
+  },
   patientID : {
     type: String,
     trim: true,
@@ -21,7 +31,7 @@ const PatientSchema = new Schema({
   password : {
     type: String,
     trim: true,
-    required: true,
+    
     validate: [
         function (input) {
           return input.length >= 6;

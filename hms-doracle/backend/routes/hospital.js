@@ -17,22 +17,35 @@ router.post("/add", (req, res) => {
   
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
-  // const patientID = req.body.patientID;
-  const password= req.body.password;
-
+  const contact = req.body.contact;
+  const email = req.body.email;
+  
   let healthid="IND";
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
+
   for ( let i = 0; i < 6; i++ ) {
     healthid+=characters.charAt(Math.floor(Math.random() * charactersLength));
- }
+   }
   const patientID = healthid;
-  // console.log(healthid);
-  const new_patient = new Patient({firstname, lastname, patientID, password});
+ 
+  let autocode = "";
+  for ( let i = 0; i < 10; i++ ) {
+    autocode+=characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+
+  const password = autocode;
+  const new_patient = new Patient({firstname, lastname, email, contact, patientID, password});
   // console.log(new_patient);
   new_patient.save()
       .then(() => res.json("Patient Added Successfully"))
       .catch(err => res.status(400).json("Error is " + err));       
+});
+
+router.get("/:id", (req, res) => {
+  Patient.findById(req.params.id)
+    .then(patient => res.json(patient))
+    .catch(err => res.status(400).json("Error is " + err));       
 });
 
 router.delete("/delete/:id", (req, res) => {
@@ -46,6 +59,8 @@ router.post("/update/:id", (req, res) => {
       .then(patient => {
           patient.firstname = req.body.firstname;
           patient.lastname = req.body.lastname;
+          patient.email = req.body.email;
+          patient.contact = req.body.contact;
           patient.patientID = req.body.patientID;
           patient.password = req.body.password;
 
