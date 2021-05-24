@@ -48,6 +48,12 @@ router.get("/:id", (req, res) => {
     .catch(err => res.status(400).json("Error is " + err));       
 });
 
+router.get("/show/:patientid", (req, res) => {
+  Patient.findOne({patientID: req.params.patientid})
+    .then(patient => res.json(patient))
+    .catch(err => res.status(400).json("Error is " + err));       
+});
+
 router.delete("/delete/:id", (req, res) => {
   Patient.findByIdAndDelete(req.params.id)
     .then(() => res.json("Patient deleted successfully"))
