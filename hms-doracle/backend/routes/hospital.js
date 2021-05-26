@@ -36,8 +36,8 @@ router.post("/add", (req, res) => {
    }
 
   const password=autocode;
-
-  console.log(password);
+   console.log(password);
+  
   const new_patient = new Patient({firstname, lastname, email, contact, patientID, password});
  
   bcrypt.genSalt(10, (err, salt) => {
@@ -83,6 +83,27 @@ router.post("/update/:id", (req, res) => {
           patient.save()
           .then(() => res.json("Updated successfully"))
           .catch(err => res.status(400).json("Error is " + err));       
+      })
+      .catch(err => res.status(400).json("Error is " + err));       
+
+});
+
+router.post("/updatePassword/:id", (req, res) => {
+  console.log(req.params.id);
+  Patient.findById(req.params.id)
+      .then(patient => {
+          patient.password=req.body.password;
+          bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(patient.password, salt, (err, hash) => {
+              if (err) throw err;
+              patient.password = hash;
+              console.log(patient.password);
+              patient.save()
+              .then(() => res.json("password Updated successfully"))
+              .catch(err => res.status(400).json("Error is " + err));  
+            });
+          });
+         
       })
       .catch(err => res.status(400).json("Error is " + err));       
 

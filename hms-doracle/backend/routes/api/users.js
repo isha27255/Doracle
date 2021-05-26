@@ -35,8 +35,8 @@ router.post("/login", (req, res) => {
     if (!user) {
       return res.status(404).json({ patientnotfound: "Patient not found" });
     }
-    console.log(user.password);
-    console.log(password);
+    // console.log(user.password);
+    // console.log(password);
     // Check password
     bcrypt.compare(password, user.password).then(isMatch => {
       if (isMatch) {
