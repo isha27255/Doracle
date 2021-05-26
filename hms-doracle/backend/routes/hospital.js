@@ -89,7 +89,7 @@ router.post("/update/:id", (req, res) => {
 });
 
 router.post("/updatePassword/:id", (req, res) => {
-  console.log(req.params.id);
+  
   Patient.findById(req.params.id)
       .then(patient => {
           patient.password=req.body.password;
@@ -97,7 +97,7 @@ router.post("/updatePassword/:id", (req, res) => {
             bcrypt.hash(patient.password, salt, (err, hash) => {
               if (err) throw err;
               patient.password = hash;
-              console.log(patient.password);
+            
               patient.save()
               .then(() => res.json("password Updated successfully"))
               .catch(err => res.status(400).json("Error is " + err));  

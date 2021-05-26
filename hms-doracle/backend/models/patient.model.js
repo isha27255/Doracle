@@ -13,6 +13,10 @@ const PatientSchema = new Schema({
     trim: true,
     required: true
   }, 
+  role: {
+    type: Number,
+    default: 0
+  },
   email : {
       type: String,
       trim: true,

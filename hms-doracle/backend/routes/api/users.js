@@ -32,9 +32,75 @@ router.post("/login", (req, res) => {
   // Find user by email
   User.findOne({ patientID }).then(user => {
     // Check if user exists
+    console.log(user.role);
+    
+    if (!user) {  
+      return res.status(404).json({ patientnotfound: "Patient not found !" });
+        }
+
+        if (user.role)
+      return res.status(404).json({ patientnotfound: "Patient Not Found !"});
+
+
+    bcrypt.compare(password, user.password).then(isMatch => {
+      if (isMatch) {
+        // User matched
+        // Create JWT Payload
+        const payload = {
+          id: user.id,
+          patientID: user.patientID
+        };
+
+        // Sign token
+        jwt.sign(
+          payload,
+          keys.secretOrKey,
+          {
+            expiresIn: 31556926 // 1 year in seconds
+          },
+          (err, token) => {
+            res.json({
+              success: true,
+              token: "Bearer " + token
+            });
+          }
+        );
+      } else {
+        return res
+          .status(400)
+          .json({ passwordincorrect: "Password incorrect" });
+      }
+    });
+   
+  });
+});
+
+
+router.post("/hlogin", (req, res) => {
+  // Form validation
+
+  const { errors, isValid } = validateLoginInput(req.body);
+
+  // Check validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
+  const patientID = req.body.patientID;
+  const password = req.body.password;
+
+  // Find user by email
+  User.findOne({ patientID }).then(user => {
+    // Check if user exists
+    console.log(user.role);
+    if (!user.role)
+    return res.status(404).json({ patientnotfound: "ADMIN STATUS DENIED" });
+
     if (!user) {
       return res.status(404).json({ patientnotfound: "Patient not found" });
-    }
+        }
+
+
     // console.log(user.password);
     // console.log(password);
     // Check password
@@ -67,6 +133,7 @@ router.post("/login", (req, res) => {
           .json({ passwordincorrect: "Password incorrect" });
       }
     });
+   
   });
 });
 
