@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
 
 let Patient = require('../models/patient.model');
 let Status = require('../models/status.model');
@@ -34,12 +35,22 @@ router.post("/add", (req, res) => {
     autocode+=characters.charAt(Math.floor(Math.random() * charactersLength));
    }
 
-  const password = autocode;
+  const password=autocode;
+
+  console.log(password);
   const new_patient = new Patient({firstname, lastname, email, contact, patientID, password});
-  // console.log(new_patient);
-  new_patient.save()
-      .then(() => res.json("Patient Added Successfully"))
-      .catch(err => res.status(400).json("Error is " + err));       
+ 
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(new_patient.password, salt, (err, hash) => {
+      if (err) throw err;
+      new_patient.password = hash;
+      new_patient
+        .save()
+        .then(() => res.json("patient added succesfully"))
+        .catch(err => res.status(400).json("Error is " + err));
+    });
+  });
+     
 });
 
 router.get("/:id", (req, res) => {
@@ -67,7 +78,6 @@ router.post("/update/:id", (req, res) => {
           patient.lastname = req.body.lastname;
           patient.email = req.body.email;
           patient.contact = req.body.contact;
-          patient.patientID = req.body.patientID;
           patient.password = req.body.password;
 
           patient.save()
@@ -92,13 +102,10 @@ router.post("/:id/status", (req, res) => {
             const note = req.body.note;
 
             const new_status = new Status({date,note});
-            // console.log(new_status);
-            // console.log(patient);
             new_status.patient = patient._id;
             new_status.save()
                 .then(() => res.json("Statusss Added Successfully"))
                 .catch(err => res.status(400).json("Error is " + err));
-                // console.log(new_status._id);
             patient.curr_status.push(new_status._id);
             patient.save();     
         })
@@ -121,13 +128,10 @@ router.post("/:id/pharmacy", (req, res) => {
             const info = req.body.info;
             
             const new_pharma = new Requirement({date, required_pharmacy, info});
-            // console.log(new_status);
-            // console.log(patient);
             new_pharma.patient = patient._id;
             new_pharma.save()
                 .then(() => res.json("Requirement Added Successfully"))
                 .catch(err => res.status(400).json("Error is " + err));
-                // console.log(new_status._id);
             patient.requirement.push(new_pharma._id);
             patient.save();     
         })
@@ -155,13 +159,10 @@ router.post("/:id/doc-report", (req, res) => {
             const doc_report_file = req.body.doc_report_file;
             
             const new_report = new Doc_Report({date, doc_report_file});
-            // console.log(new_status);
-            // console.log(patient);
             new_report.patient = patient._id;
             new_report.save()
                 .then(() => res.json("Doc Report Added Successfully"))
                 .catch(err => res.status(400).json("Error is " + err));
-                // console.log(new_status._id);
             patient.doc_reports.push(new_report._id);
             patient.save();     
         })
@@ -175,4 +176,4 @@ router.post("/:id/doc-report", (req, res) => {
 //mass data upload through excel sheet
   
 
-module.exports = router;
+module.exports = router

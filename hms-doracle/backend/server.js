@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require('cors');
 const mongoose = require("mongoose");
-
+const passport = require("passport");
+const users = require("./routes/api/users");
 require('dotenv').config()
 
 const app = express();
@@ -16,12 +17,20 @@ connection.once('open', () => {
     console.log("Mongo DB database established successfully");
 })
 
+// Passport middleware
+app.use(passport.initialize());
+
+// Passport config
+require("./config/passport")(passport);
+
+// Routes
+app.use("/api/users", users);
+
 const port = process.env.PORT || 4000;
 
 
 const PatientRouter = require('./routes/patient');
 const HospitalRouter = require('./routes/hospital');
-
 
 
 app.use('/patient', PatientRouter);
