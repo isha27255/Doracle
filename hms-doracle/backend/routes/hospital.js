@@ -9,6 +9,8 @@ let  Report = require('../models/lab_report_f.model');
 let Doc_Report = require('../models/lab_report_h.model');
 const nodemailer = require('nodemailer');
 require("dotenv").config();
+const fileUpload = require('express-fileupload');
+const csv = require('csv-parser');
 
 let mailTransporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -24,12 +26,85 @@ router.get("/", (req, res) => {
       .catch(err => res.status(400).json("Error is " + err));
 });
 
+const {Duplex} = require('stream'); // Native Node Module 
+
+function bufferToStream(myBuuffer) {
+    let tmp = new Duplex();
+    tmp.push(myBuuffer);
+    tmp.push(null);
+    return tmp;
+}
+
+router.post('/upload', fileUpload(), (req, res) => {
+  
+  const myReadableStream = bufferToStream(req.files.myFile.data);
+  myReadableStream.pipe(csv())
+    .on('data', (row) => {
+
+      const firstname = row.firstname;
+      const lastname = row.lastname;
+      const contact = row.contact;
+      const email = row.email;
+
+      let healthid="IND";
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const charactersLength = characters.length;
+
+      for ( let i = 0; i < 6; i++ ) {
+          healthid+=characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      const patientID = healthid;
+      
+      let autocode = "";
+      for ( let i = 0; i < 10; i++ ) {
+          autocode+=characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+
+      const password=autocode;
+      console.log(password);
+      
+      const new_patient = new Patient({firstname, lastname, email, contact, patientID, password});
+
+      const mailbody = `Greetings ${firstname} ${lastname}.\n\nWe are happy to state that you have been successfuly registered in Doracle, and your patient's health will be monitored by our software in a hassle-free way. So, no more hickups regarding regular patient health updates. We have got you covered.\n\nOn that note, here's your PatientID and Password that will be required to login to our portal.\nPatientID - ${patientID}\nPassword - ${password}\n\nThe above data is highly confidential. Please do not share it with anyone. Also, we would advice you to reset your password when you login for the first time. We hope your patient recovers soon!`
+
+      let mailDetails = {
+          from: process.env.USER,
+          to: email,
+          subject: 'Signed up on Doracle',
+          text: mailbody
+      };
+      
+      mailTransporter.sendMail(mailDetails, function(err, data) {
+          if(err) {
+          console.log('Error Occured');
+          } else {
+          console.log('Email sent successfully');
+          }
+      });
+      
+      bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(new_patient.password, salt, (err, hash) => {
+          if (err) throw err;
+          new_patient.password = hash;
+          new_patient
+              .save()
+              .then(() => res.json("patient added succesfully"))
+              .catch(err => res.status(400).json("Error is " + err));
+          });
+      });
+      })
+    .on('end', () => {
+      console.log('CSV file successfully processed');
+    });
+})
+
 router.post("/add", (req, res) => {
   
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const contact = req.body.contact;
   const email = req.body.email;
+  const roll = req.body.roll;
   
   let healthid="IND";
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -48,20 +123,9 @@ router.post("/add", (req, res) => {
   const password=autocode;
    console.log(password);
   
-  const new_patient = new Patient({firstname, lastname, email, contact, patientID, password});
+  const new_patient = new Patient({firstname, lastname, email, contact, roll, patientID, password});
 
-  const mailbody = `Greetings ${firstname} ${lastname}.
-  
-  We are happy to state that you have been successfuly registered in Doracle, and your patient's health will be monitored by our software in a hassle-free way. So, no more hickups regarding regular patient health updates.
-  We have got you covered.
-  
-  On that note, here's your PatientID and Password that will be required to login to our portal.
-  PatientID - ${patientID}
-  Password - ${password}
-  
-  The above data is highly confidential. Please do not share it with anyone. Also, we would advice you to reset your password
-  when you login for the first time. We hope your patient recovers soon!
-  `
+  const mailbody = `Greetings ${firstname} ${lastname}.\n\nWe are happy to state that you have been successfuly registered in Doracle, and your patient's health will be monitored by our software in a hassle-free way. So, no more hickups regarding regular patient health updates. We have got you covered.\n\nOn that note, here's your PatientID and Password that will be required to login to our portal.\nPatientID - ${patientID}\nPassword - ${password}\n\nThe above data is highly confidential. Please do not share it with anyone. Also, we would advice you to reset your password when you login for the first time. We hope your patient recovers soon!`
 
   let mailDetails = {
     from: process.env.USER,
