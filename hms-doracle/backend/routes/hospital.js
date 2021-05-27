@@ -7,6 +7,16 @@ let Status = require('../models/status.model');
 let Requirement = require('../models/requirement.model');
 let  Report = require('../models/lab_report_f.model');
 let Doc_Report = require('../models/lab_report_h.model');
+const nodemailer = require('nodemailer');
+require("dotenv").config();
+
+let mailTransporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: process.env.USER,
+		pass: process.env.PASSWORD
+	}
+});
 
 router.get("/", (req, res) => {
   Patient.find()
@@ -39,6 +49,34 @@ router.post("/add", (req, res) => {
    console.log(password);
   
   const new_patient = new Patient({firstname, lastname, email, contact, patientID, password});
+
+  const mailbody = `Greetings ${firstname} ${lastname}.
+  
+  We are happy to state that you have been successfuly registered in Doracle, and your patient's health will be monitored by our software in a hassle-free way. So, no more hickups regarding regular patient health updates.
+  We have got you covered.
+  
+  On that note, here's your PatientID and Password that will be required to login to our portal.
+  PatientID - ${patientID}
+  Password - ${password}
+  
+  The above data is highly confidential. Please do not share it with anyone. Also, we would advice you to reset your password
+  when you login for the first time. We hope your patient recovers soon!
+  `
+
+  let mailDetails = {
+    from: process.env.USER,
+    to: email,
+    subject: 'Signed up on Doracle',
+    text: mailbody
+  };
+  
+  mailTransporter.sendMail(mailDetails, function(err, data) {
+    if(err) {
+      console.log('Error Occured');
+    } else {
+      console.log('Email sent successfully');
+    }
+  });
  
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(new_patient.password, salt, (err, hash) => {
@@ -50,7 +88,6 @@ router.post("/add", (req, res) => {
         .catch(err => res.status(400).json("Error is " + err));
     });
   });
-     
 });
 
 router.get("/:id", (req, res) => {
