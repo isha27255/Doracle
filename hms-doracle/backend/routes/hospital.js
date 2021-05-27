@@ -78,7 +78,6 @@ router.post("/update/:id", (req, res) => {
           patient.lastname = req.body.lastname;
           patient.email = req.body.email;
           patient.contact = req.body.contact;
-          patient.password = req.body.password;
 
           patient.save()
           .then(() => res.json("Updated successfully"))
