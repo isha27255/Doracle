@@ -30,7 +30,8 @@ router.post("/login", (req, res) => {
   const password = req.body.password;
 
   // Find user by email
-  User.findOne({ patientID }).then(user => {
+  User.findOne({ patientID })
+  .then(user => {
     // Check if user exists
     console.log(user.role);
     
@@ -72,7 +73,8 @@ router.post("/login", (req, res) => {
       }
     });
    
-  });
+  })
+  .catch(err => res.status(400).json({ patientnotfound: "Patient Not Found !"}));
 });
 
 
@@ -135,6 +137,7 @@ router.post("/hlogin", (req, res) => {
     });
    
   });
+  
 });
 
 module.exports = router;
