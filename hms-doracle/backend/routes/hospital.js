@@ -16,7 +16,7 @@ let mailTransporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
 		user: process.env.USER,
-		pass: process.env.PASSWORD
+		pass: process.env.PASSWORD,
 	}
 });
 
