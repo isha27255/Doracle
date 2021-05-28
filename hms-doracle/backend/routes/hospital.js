@@ -104,7 +104,7 @@ router.post("/add", (req, res) => {
   const lastname = req.body.lastname;
   const contact = req.body.contact;
   const email = req.body.email;
-  const roll = req.body.roll;
+  const role = req.body.role;
   
   let healthid="IND";
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -123,7 +123,7 @@ router.post("/add", (req, res) => {
   const password=autocode;
    console.log(password);
   
-  const new_patient = new Patient({firstname, lastname, email, contact, roll, patientID, password});
+  const new_patient = new Patient({firstname, lastname, email, contact, role, patientID, password});
 
   const mailbody = `Greetings ${firstname} ${lastname}.\n\nWe are happy to state that you have been successfuly registered in Doracle, and your patient's health will be monitored by our software in a hassle-free way. So, no more hickups regarding regular patient health updates. We have got you covered.\n\nOn that note, here's your PatientID and Password that will be required to login to our portal.\nPatientID - ${patientID}\nPassword - ${password}\n\nThe above data is highly confidential. Please do not share it with anyone. Also, we would advice you to reset your password when you login for the first time. We hope your patient recovers soon!`
 
