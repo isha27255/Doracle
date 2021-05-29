@@ -30,6 +30,7 @@ const PatientSchema = new Schema({
   patientID : {
     type: String,
     trim: true,
+    // required: true
   }, 
   password : {
     type: String,
@@ -67,7 +68,17 @@ const PatientSchema = new Schema({
         ref: 'Status',
         
        }
-   ]
+   ],
+   stds:
+   {
+     type: Array,
+     default: [],
+   },
+   rqtm:
+   {
+    type: Array,
+    default: [],
+   }
 },
  {
     timestamps: true

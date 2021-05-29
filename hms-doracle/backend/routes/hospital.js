@@ -219,7 +219,7 @@ router.post("/:id/status", (req, res) => {
 
   Patient.findById(req.params.id)
         .then(patient => {
-            const date = req.body.date;
+            const date = Date.parse(req.body.date);
             const note = req.body.note;
 
             const new_status = new Status({date,note});
@@ -227,8 +227,10 @@ router.post("/:id/status", (req, res) => {
             new_status.save()
                 .then(() => res.json("Statusss Added Successfully"))
                 .catch(err => res.status(400).json("Error is " + err));
+            // console.log(new_status);
             patient.curr_status.push(new_status._id);
-            patient.save();     
+            patient.stds.push(new_status);
+            patient.save();   
         })
         .catch(err => res.status(400).json("Error is " + err));  
        
@@ -244,7 +246,7 @@ router.post("/:id/pharmacy", (req, res) => {
 
   Patient.findById(req.params.id)
         .then(patient => {
-            const date = req.body.date;
+            const date = Date.parse(req.body.date);
             const required_pharmacy = req.body.required_pharmacy;
             const info = req.body.info;
             
@@ -254,6 +256,7 @@ router.post("/:id/pharmacy", (req, res) => {
                 .then(() => res.json("Requirement Added Successfully"))
                 .catch(err => res.status(400).json("Error is " + err));
             patient.requirement.push(new_pharma._id);
+            patient.rqtm.push(new_pharma);
             patient.save();     
         })
         .catch(err => res.status(400).json("Error is " + err));  
@@ -264,6 +267,28 @@ router.get("/:id/home-report/:hid", (req, res) => {
   Report.findById(req.params.hid)
     .then(report => res.json(report))
     .catch(err => res.status(400).json("Error is " + err));       
+});
+
+router.post("/:id/home-report", (req, res) => {
+
+  Patient.findById(req.params.id)
+        .then(patient => {
+            const date = Date.parse(req.body.date);
+            const report_file = req.body.report_file;
+            
+            const new_report = new Report({date, report_file});
+            // console.log(new_status);
+            // console.log(patient);
+            new_report.patient = patient._id;
+            new_report.save()
+                .then(() => res.json("Home Lab Report Added Successfully"))
+                .catch(err => res.status(400).json("Error is " + err));
+                // console.log(new_status._id);
+            patient.reports.push(new_report._id);
+            patient.save();     
+        })
+        .catch(err => res.status(400).json("Error is " + err));  
+       
 });
 
 router.get("/:id/doc-report/:did", (req, res) => {
