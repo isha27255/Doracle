@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const RequirementSchema = new Schema({
 
 date : {
-  type: Date,
+  type: String,
   required: true
 } ,
 required_pharmacy  : {

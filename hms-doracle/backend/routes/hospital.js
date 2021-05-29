@@ -219,7 +219,7 @@ router.post("/:id/status", (req, res) => {
 
   Patient.findById(req.params.id)
         .then(patient => {
-            const date = Date.parse(req.body.date);
+            const date = req.body.date;
             const note = req.body.note;
 
             const new_status = new Status({date,note});
@@ -244,7 +244,7 @@ router.post("/:id/pharmacy", (req, res) => {
 
   Patient.findById(req.params.id)
         .then(patient => {
-            const date = Date.parse(req.body.date);
+            const date = req.body.date;
             const required_pharmacy = req.body.required_pharmacy;
             const info = req.body.info;
             

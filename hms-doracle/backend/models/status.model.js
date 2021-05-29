@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const StatusSchema = new Schema({
 
   date : {
-      type: Date,
+      type: String,
       required: true
   }, 
   note : {
