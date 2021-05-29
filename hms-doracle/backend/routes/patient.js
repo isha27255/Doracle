@@ -8,49 +8,10 @@ let  Report = require('../models/lab_report_f.model');
 let Doc_Report = require('../models/lab_report_h.model');
 
 
-//patients
-
-//create
-router.post("/add", (req, res) => {
-  
-    const firstname = req.body.firstname;
-    const lastname = req.body.lastname;
-    const contact = req.body.contact;
-    const email = req.body.email;
-    
-    let healthid="IND";
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-
-    for ( let i = 0; i < 6; i++ ) {
-      healthid+=characters.charAt(Math.floor(Math.random() * charactersLength));
-     }
-    const patientID = healthid;
-   
-    let autocode = "";
-    for ( let i = 0; i < 10; i++ ) {
-      autocode+=characters.charAt(Math.floor(Math.random() * charactersLength));
-     }
-
-    const password = autocode;
-    const new_patient = new Patient({firstname, lastname, email, contact, patientID, password});
-    // console.log(new_patient);
-    new_patient.save()
-        .then(() => res.json("Patient Added Successfully"))
-        .catch(err => res.status(400).json("Error is " + err));       
-});
-
 //read data by id
 router.get("/:id", (req, res) => {
   Patient.findById(req.params.id)
     .then(patient => res.json(patient))
-    .catch(err => res.status(400).json("Error is " + err));       
-});
-
-//delete data by id
-router.delete("/delete/:id", (req, res) => {
-  Patient.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Patient deleted successfully"))
     .catch(err => res.status(400).json("Error is " + err));       
 });
 
@@ -72,10 +33,8 @@ router.post("/update/:id", (req, res) => {
         .catch(err => res.status(400).json("Error is " + err));       
   
 });
-// patients
 
 // status
-
 router.get("/:id/status/:sid", (req, res) => {
     Status.findById(req.params.sid)
       .then(status => res.json(status))
@@ -83,10 +42,7 @@ router.get("/:id/status/:sid", (req, res) => {
   });
 
 
-// status
-
 // pharmacy requirement
-
 router.get("/:id/pharmacy/:pid", (req, res) => {
     Requirement.findById(req.params.pid)
       .then(pharma => res.json(pharma))
@@ -95,10 +51,7 @@ router.get("/:id/pharmacy/:pid", (req, res) => {
 
 
 
-// pharmacy requirement
-
 // lab report by family
-
 router.get("/:id/home-report/:hid", (req, res) => {
     Report.findById(req.params.hid)
       .then(report => res.json(report))
@@ -127,19 +80,11 @@ router.post("/:id/home-report", (req, res) => {
        
 });
 
-// lab report by family 
-
 // lab reports by doc
-
 router.get("/:id/doc-report/:did", (req, res) => {
     Doc_Report.findById(req.params.did)
       .then(report => res.json(report))
       .catch(err => res.status(400).json("Error is " + err));       
   });
-
-
-// lab reports by doc
-
-
 
 module.exports = router;
